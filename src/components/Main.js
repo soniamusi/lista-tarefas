@@ -10,12 +10,61 @@ import { FaEdit, FaWindowClose } from "react-icons/fa";
 export default class Main extends Component {
   state = {
     novaTarefa: "",
-    tarefas: ["Fazer cafe", "Beber agura", "Ir para academia"],
+    tarefas: [],
+    index: -1,
   };
+
+  /**INCLUINDO AS TAREFAS SUBMIT */
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const { tarefas, index } = this.state;
+    let { novaTarefa } = this.state;
+    novaTarefa = novaTarefa.trim();
+
+    if (tarefas.indexOf(novaTarefa) != -1) return;
+    const novasTarefas = [...tarefas];
+
+    /*Aqui cria uma nova tarefa e edita no else*/
+    if (index == -1) {
+      this.setState({
+        tarefas: [...novasTarefas, novaTarefa],
+        novaTarefa: "",
+      });
+    } else {
+      novasTarefas[index] = novaTarefa;
+      this.setState({
+        tarefas: [...novasTarefas],
+        index: -1,
+      });
+    }
+  };
+
+  /**FIM */
 
   handleChange = (e) => {
     this.setState({
       novaTarefa: e.target.value,
+    });
+  };
+
+  /*EDITAR AS TAREFAS*/
+  handleEdit = (e, index) => {
+    const { tarefas } = this.state;
+
+    this.setState({
+      index,
+      novaTarefa: tarefas[index],
+    });
+  };
+
+  /*APAGAR AS TAREFAS*/
+  handleDelete = (e, index) => {
+    const { tarefas } = this.state;
+    const novasTarefas = [...tarefas];
+    novasTarefas.splice(index, 1);
+
+    this.setState({
+      tarefas: [...novasTarefas],
     });
   };
 
@@ -25,7 +74,7 @@ export default class Main extends Component {
       <div className="main">
         <h1>Lista de Tarefas</h1>
 
-        <form action="#" className="form">
+        <form onSubmit={this.handleSubmit} action="#" className="form">
           <input onChange={this.handleChange} type="text" value={novaTarefa} />
           <button type="submit">
             <FaPlus />
@@ -33,12 +82,18 @@ export default class Main extends Component {
         </form>
 
         <ul className="tarefas">
-          {tarefas.map((tarefa) => (
+          {tarefas.map((tarefa, index) => (
             <li key={tarefa}>
               {tarefa}
               <div>
-                <FaEdit className="edit" />
-                <FaWindowClose className="delete" />
+                <FaEdit
+                  onClick={(e) => this.handleEdit(e, index)}
+                  className="edit"
+                />
+                <FaWindowClose
+                  onClick={(e) => this.handleDelete(e, index)}
+                  className="delete"
+                />
               </div>
             </li>
           ))}
